@@ -19,6 +19,11 @@ namespace WebApplication1.Data
             return await table.ToListAsync();
         }
 
+        public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await table.Where(predicate).ToListAsync();
+        }
+
         public async Task<T> GetByIdAsync(int id)
         {
             return await table.FindAsync(id);
@@ -48,6 +53,7 @@ namespace WebApplication1.Data
         {
             return await _db.SaveChangesAsync() > 0;
         }
+
 
     }
 }

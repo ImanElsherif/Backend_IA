@@ -39,31 +39,46 @@ namespace WebApplication1.Controllers
             return Ok(users);
         }
 
-        
-
-
-  
-   /*     [HttpGet("{id}")]
-        public async Task<IActionResult> GetUserWithDepartment(int id)
+        [HttpGet("employers")]
+        public async Task<IActionResult> GetEmployers()
         {
-            var user = await _userRepository.GetByIdAsync(id);
-            if (user == null)
+            // You would need to know the ID or criteria that defines an employer
+            // Example: assuming 'employer' role is user type id 3
+            const int employerTypeId = 5; // This should be dynamically retrieved or configured if possible
+
+            var employers = await _userRepository.GetAllAsync(u => u.UserTypeId == employerTypeId);
+            if (employers == null || !employers.Any())
             {
-                return NotFound();
+                return NotFound("No employers found.");
             }
 
-            var department = await _departmentRepository.GetByIdAsync(user.DepartmentId);
-            if (department == null)
-            {
-                return NotFound("Department not found");
-            }
+            return Ok(employers);
+        }
 
-            user.Department = department;
 
-            return Ok(user);
-        }*/
 
-        
+
+        /*     [HttpGet("{id}")]
+             public async Task<IActionResult> GetUserWithDepartment(int id)
+             {
+                 var user = await _userRepository.GetByIdAsync(id);
+                 if (user == null)
+                 {
+                     return NotFound();
+                 }
+
+                 var department = await _departmentRepository.GetByIdAsync(user.DepartmentId);
+                 if (department == null)
+                 {
+                     return NotFound("Department not found");
+                 }
+
+                 user.Department = department;
+
+                 return Ok(user);
+             }*/
+
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
