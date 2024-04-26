@@ -12,7 +12,7 @@ namespace WebApplication1.Data
         public DbSet<Department> Department { get; set; }
         public DbSet<Course> Course { get; set; }
         public DbSet<StudentCourse> StudentCourse { get; set; }
-
+        public DbSet<Job> Jobs { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<StudentCourse>().HasKey(sc => new {sc.UserId, sc.CourseId});
