@@ -38,11 +38,12 @@ namespace WebApplication1.Controllers
                  }
             return Ok(users);
         }
+
         
 
 
   
-        [HttpGet("{id}")]
+   /*     [HttpGet("{id}")]
         public async Task<IActionResult> GetUserWithDepartment(int id)
         {
             var user = await _userRepository.GetByIdAsync(id);
@@ -60,7 +61,7 @@ namespace WebApplication1.Controllers
             user.Department = department;
 
             return Ok(user);
-        }
+        }*/
 
         
         [HttpDelete("{id}")]
