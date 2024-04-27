@@ -85,6 +85,22 @@ namespace WebApplication1.Controllers
             return NoContent();  // HTTP 204 - No content to send in response, signifies successful update
         }
 
+        [HttpPatch("{id}/increment-proposals")]
+        public async Task<IActionResult> IncrementProposals(int id)
+        {
+            var job = await _jobRepository.GetByIdAsync(id);
+            if (job == null)
+            {
+                return NotFound($"No job found with ID {id}");
+            }
+
+            job.NumProposals++;  // Increment the number of proposals
+
+            _jobRepository.UpdateAsync(job);  // Save the updated job
+            await _jobRepository.Save();
+
+            return NoContent();  // Return HTTP 204 No Content to indicate success without sending data back
+        }
 
     }
 }
