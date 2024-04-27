@@ -12,9 +12,12 @@ namespace WebApplication1.Controllers
     public class ProposalsController : ControllerBase
     {
         private readonly IDataRepository<Proposal> _proposalRepository;
+        private readonly IDataRepository<Job> _jobRepository;
 
-        public ProposalsController(IDataRepository<Proposal> proposalRepository)
+
+        public ProposalsController(IDataRepository<Job> jobRepository, IDataRepository<Proposal> proposalRepository)
         {
+            _jobRepository = jobRepository;
             _proposalRepository = proposalRepository;
         }
 
@@ -23,11 +26,11 @@ namespace WebApplication1.Controllers
         {
             // Check if a proposal already exists for this job from the same employer
             var existingProposal = await _proposalRepository.GetByCustomCriteria(p =>
-                p.JobId == proposalDto.JobId && p.EmployerId == proposalDto.EmployerId);
+                p.JobId == proposalDto.JobId && p.JobSeekerId == proposalDto.JobSeekerId);
 
             if (existingProposal != null)
             {
-                return BadRequest("A proposal from this employer for this job already exists.");
+                return BadRequest("A proposal from this job seeker for this job already exists.");
             }
 
             string filePath = null;  // Declare filePath outside the if block
@@ -55,22 +58,35 @@ namespace WebApplication1.Controllers
 
                 // Clear the IFormFile object as it's not needed anymore
                 proposalDto.Attachment = null;
+
+                // Increment the number of proposals for the corresponding job
+                var job = await _jobRepository.GetByIdAsync(proposalDto.JobId);
+                if (job != null)
+                {
+                    job.NumProposals++;
+                    await _jobRepository.UpdateAsync(job);
+                    await _jobRepository.Save(); // Save changes to the database
+                }
             }
 
-            var proposal = new Proposal
+            // Create a new Proposal object
+            var newProposal = new Proposal
             {
                 JobId = proposalDto.JobId,
                 JobSeekerId = proposalDto.JobSeekerId,
                 EmployerId = proposalDto.EmployerId,
-                Attachment = filePath,  // filePath is now accessible here
-                Status = proposalDto.Status
+                Attachment = filePath, // Save the file path in the database
+                Status = "Pending" // Set the status of the proposal
             };
 
-            await _proposalRepository.AddAsync(proposal);
+            // Add the new proposal to the repository and save changes
+            await _proposalRepository.AddAsync(newProposal);
             await _proposalRepository.Save();
 
-            return CreatedAtAction(nameof(GetProposalById), new { id = proposal.ProposalId }, proposal);
+            return Ok("Proposal created successfully.");
         }
+
+
 
 
 
