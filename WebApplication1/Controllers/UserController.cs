@@ -183,6 +183,7 @@ namespace WebApplication1.Controllers
             }
 
             // Explicitly assign the values of other fields from existingUser to userDto
+
             userDto.Skills = existingUser.Skills;
             userDto.ProfilePic = existingUser.ProfilePic;
             userDto.Age = existingUser.Age;

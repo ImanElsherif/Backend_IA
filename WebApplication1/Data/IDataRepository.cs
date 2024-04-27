@@ -7,6 +7,7 @@ namespace WebApplication1.Data
         Task<IEnumerable<T>> GetAllAsync();
         Task<T> GetByIdAsync(int id);
         Task<T> GetByCustomCriteria(Expression<Func<T, bool>> criteria);
+
         Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>> predicate);
         Task AddAsync(T entity);
         Task UpdateAsync(T entity);

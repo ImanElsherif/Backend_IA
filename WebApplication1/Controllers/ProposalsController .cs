@@ -21,6 +21,15 @@ namespace WebApplication1.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateProposal([FromForm] ProposalDto proposalDto)
         {
+            // Check if a proposal already exists for this job from the same employer
+            var existingProposal = await _proposalRepository.GetByCustomCriteria(p =>
+                p.JobId == proposalDto.JobId && p.EmployerId == proposalDto.EmployerId);
+
+            if (existingProposal != null)
+            {
+                return BadRequest("A proposal from this employer for this job already exists.");
+            }
+
             string filePath = null;  // Declare filePath outside the if block
 
             if (proposalDto.Attachment != null && proposalDto.Attachment.Length > 0)
@@ -76,6 +85,50 @@ namespace WebApplication1.Controllers
 
             return Ok(proposal);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllProposals()
+        {
+            var proposals = await _proposalRepository.GetAllAsync();
+            return Ok(proposals);
+        }
+
+        [HttpPut("{id}/status")]
+        public async Task<IActionResult> UpdateProposalStatus(int id, [FromBody] string status)
+        {
+            var proposal = await _proposalRepository.GetByIdAsync(id);
+            if (proposal == null)
+            {
+                return NotFound($"No proposal found with ID {id}");
+            }
+
+            proposal.Status = status;
+            await _proposalRepository.UpdateAsync(proposal);
+            await _proposalRepository.Save();
+
+            return Ok(proposal);
+        }
+
+
+        [HttpGet("employer/{employerId}")]
+        public async Task<IActionResult> GetProposalsByEmployerId(int employerId)
+        {
+            var proposals = await _proposalRepository.GetAllAsync(p => p.EmployerId == employerId);
+            return Ok(proposals);
+        }
+
+        [HttpGet("notaccepted")]
+        public async Task<IActionResult> GetProposalsNotAccepted()
+        {
+            var proposals = await _proposalRepository.GetAllAsync(p => p.Status != "Accepted");
+
+            // Filter out duplicate job IDs
+            var uniqueProposals = proposals.GroupBy(p => p.JobId).Select(group => group.First()).ToList();
+
+            return Ok(uniqueProposals);
+        }
+
+
 
         // You can add more methods here for updating, deleting, etc., based on your requirements.
     }

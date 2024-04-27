@@ -11,11 +11,14 @@ namespace WebApplication1.Controllers
     public class JobsController : ControllerBase
     {
         private readonly IDataRepository<Job> _jobRepository;
+        private readonly IDataRepository<Proposal> _proposalRepository;
 
-        public JobsController(IDataRepository<Job> jobRepository)
+        public JobsController(IDataRepository<Job> jobRepository, IDataRepository<Proposal> proposalRepository)
         {
             _jobRepository = jobRepository;
+            _proposalRepository = proposalRepository;
         }
+
 
         [HttpGet]
         public async Task<IActionResult> GetAllJobs()
@@ -101,6 +104,46 @@ namespace WebApplication1.Controllers
 
             return NoContent();  // Return HTTP 204 No Content to indicate success without sending data back
         }
+
+        [HttpGet("accepted-jobs-with-no-accepted-proposals")]
+        public async Task<IActionResult> GetAcceptedJobsWithNoAcceptedProposals()
+        {
+            try
+            {
+                // Retrieve all jobs with "Accepted" status
+                var acceptedJobs = await _jobRepository.GetAllAsync(job => job.Status == "Accepted");
+                if (acceptedJobs == null)
+                {
+                    return StatusCode(500, "Error fetching accepted jobs.");
+                }
+
+                // Get job IDs of accepted jobs
+                var acceptedJobIds = acceptedJobs.Select(job => job.JobId).ToList();
+
+                // Retrieve proposals associated with accepted jobs
+                var acceptedProposals = await _proposalRepository.GetAllAsync(proposal => acceptedJobIds.Contains(proposal.JobId) && proposal.Status == "Accepted");
+                if (acceptedProposals == null)
+                {
+                    return StatusCode(500, "Error fetching accepted proposals.");
+                }
+
+                // Get job IDs of accepted proposals
+                var acceptedProposalJobIds = acceptedProposals.Select(proposal => proposal.JobId).ToList();
+
+                // Retrieve jobs with "Accepted" status but no accepted proposals
+                var jobsWithNoAcceptedProposals = acceptedJobs.Where(job => !acceptedProposalJobIds.Contains(job.JobId));
+
+                return Ok(jobsWithNoAcceptedProposals);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while fetching jobs with no accepted proposals: {ex.Message}");
+            }
+        }
+
+
+
+
 
     }
 }
