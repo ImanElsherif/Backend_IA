@@ -33,5 +33,6 @@ namespace WebApplication1.Dtos
         public string? ProfilePic { get; set; }
         public int? Age { get; set; }
         public string? DescriptionBio { get; set; }
+        public int Id { get; internal set; }
     }
 }
