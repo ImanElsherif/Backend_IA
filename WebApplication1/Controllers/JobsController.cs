@@ -56,7 +56,6 @@ namespace WebApplication1.Controllers
             return CreatedAtAction(nameof(GetJobById), new { id = job.JobId }, job);
         }
 
-        // Additional methods (Update, Delete) can be added here
         [HttpPut("{id}/status")]
         public async Task<IActionResult> UpdateJobStatus(int id, [FromBody] string status)
         {
@@ -73,10 +72,10 @@ namespace WebApplication1.Controllers
             }
 
             // Check if the job is in a state that can be transitioned to the given status
-            
+
 
             // Validate the input status
-            
+
 
             job.Status = status;  // Update the status
 
@@ -85,7 +84,6 @@ namespace WebApplication1.Controllers
 
             return NoContent();  // HTTP 204 - No content to send in response, signifies successful update
         }
-
 
 
     }
