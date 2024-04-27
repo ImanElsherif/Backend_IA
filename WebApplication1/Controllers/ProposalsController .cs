@@ -77,6 +77,37 @@ namespace WebApplication1.Controllers
             return Ok(proposal);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetAllProposals()
+        {
+            var proposals = await _proposalRepository.GetAllAsync();
+            return Ok(proposals);
+        }
+
+        [HttpPut("{id}/status")]
+        public async Task<IActionResult> UpdateProposalStatus(int id, [FromBody] string status)
+        {
+            var proposal = await _proposalRepository.GetByIdAsync(id);
+            if (proposal == null)
+            {
+                return NotFound($"No proposal found with ID {id}");
+            }
+
+            proposal.Status = status;
+            await _proposalRepository.UpdateAsync(proposal);
+            await _proposalRepository.Save();
+
+            return Ok(proposal);
+        }
+
+
+        [HttpGet("employer/{employerId}")]
+        public async Task<IActionResult> GetProposalsByEmployerId(int employerId)
+        {
+            var proposals = await _proposalRepository.GetAllAsync(p => p.EmployerId == employerId);
+            return Ok(proposals);
+        }
+
         // You can add more methods here for updating, deleting, etc., based on your requirements.
     }
 }
