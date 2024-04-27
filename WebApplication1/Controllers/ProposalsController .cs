@@ -21,6 +21,15 @@ namespace WebApplication1.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateProposal([FromForm] ProposalDto proposalDto)
         {
+            // Check if a proposal already exists for this job from the same employer
+            var existingProposal = await _proposalRepository.GetByCustomCriteria(p =>
+                p.JobId == proposalDto.JobId && p.EmployerId == proposalDto.EmployerId);
+
+            if (existingProposal != null)
+            {
+                return BadRequest("A proposal from this employer for this job already exists.");
+            }
+
             string filePath = null;  // Declare filePath outside the if block
 
             if (proposalDto.Attachment != null && proposalDto.Attachment.Length > 0)
@@ -107,6 +116,19 @@ namespace WebApplication1.Controllers
             var proposals = await _proposalRepository.GetAllAsync(p => p.EmployerId == employerId);
             return Ok(proposals);
         }
+
+        [HttpGet("notaccepted")]
+        public async Task<IActionResult> GetProposalsNotAccepted()
+        {
+            var proposals = await _proposalRepository.GetAllAsync(p => p.Status != "Accepted");
+
+            // Filter out duplicate job IDs
+            var uniqueProposals = proposals.GroupBy(p => p.JobId).Select(group => group.First()).ToList();
+
+            return Ok(uniqueProposals);
+        }
+
+
 
         // You can add more methods here for updating, deleting, etc., based on your requirements.
     }
