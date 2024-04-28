@@ -173,6 +173,29 @@ namespace WebApplication1.Controllers
             return Ok(proposals);
         }
 
+        [HttpGet("job/{jobId}/user/{userId}")]
+        public async Task<IActionResult> GetProposalStatusByJobAndUser(int jobId, int userId)
+        {
+            try
+            {
+                // Find the proposal by job ID and user ID
+                var proposal = await _proposalRepository.GetByCustomCriteria(p =>
+                    p.JobId == jobId && p.JobSeekerId == userId);
+
+                if (proposal != null)
+                {
+                    return Ok(proposal.Status);
+                }
+                else
+                {
+                    return NotFound("No proposal found for this job and user.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
 
         // You can add more methods here for updating, deleting, etc., based on your requirements.
     }
