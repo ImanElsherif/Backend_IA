@@ -166,6 +166,12 @@ namespace WebApplication1.Controllers
             return Ok(uniqueProposals);
         }
 
+        [HttpGet("user/{jobSeekerId}")]
+        public async Task<IActionResult> GetProposalsByJobSeekerId(int jobSeekerId)
+        {
+            var proposals = await _proposalRepository.GetAllAsync(p => p.JobSeekerId == jobSeekerId);
+            return Ok(proposals);
+        }
 
 
         // You can add more methods here for updating, deleting, etc., based on your requirements.
