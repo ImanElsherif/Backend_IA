@@ -124,6 +124,28 @@ namespace WebApplication1.Controllers
 
             return Ok(proposal);
         }
+        [HttpGet("attachment/{proposalId}")]
+        public async Task<IActionResult> GetAttachment(int proposalId)
+        {
+            var proposal = await _proposalRepository.GetByIdAsync(proposalId);
+            if (proposal == null)
+            {
+                return NotFound($"No proposal found with ID {proposalId}");
+            }
+
+            if (string.IsNullOrEmpty(proposal.Attachment))
+            {
+                return NotFound("Attachment not found for this proposal");
+            }
+
+            // Get the file content
+            var fileBytes = await System.IO.File.ReadAllBytesAsync(proposal.Attachment);
+            var fileName = Path.GetFileName(proposal.Attachment);
+
+            // Return the file
+            return File(fileBytes, "application/octet-stream", fileName);
+        }
+
 
 
         [HttpGet("employer/{employerId}")]
@@ -148,4 +170,6 @@ namespace WebApplication1.Controllers
 
         // You can add more methods here for updating, deleting, etc., based on your requirements.
     }
+
+
 }
