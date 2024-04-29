@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApplication1.Data;
 
@@ -11,9 +12,11 @@ using WebApplication1.Data;
 namespace WebApplication1.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240429112459_deleteDeparttt")]
+    partial class deleteDeparttt
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,6 +24,28 @@ namespace WebApplication1.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("WebApplication1.Models.Course", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Course");
+                });
 
             modelBuilder.Entity("WebApplication1.Models.IdentityCard", b =>
                 {
@@ -136,6 +161,24 @@ namespace WebApplication1.Migrations
                     b.ToTable("SavedJob");
                 });
 
+            modelBuilder.Entity("WebApplication1.Models.StudentCourse", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CourseId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Grade")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserId", "CourseId");
+
+                    b.HasIndex("CourseId");
+
+                    b.ToTable("StudentCourse");
+                });
+
             modelBuilder.Entity("WebApplication1.Models.User", b =>
                 {
                     b.Property<int>("Id")
@@ -208,6 +251,17 @@ namespace WebApplication1.Migrations
                     b.ToTable("UserType");
                 });
 
+            modelBuilder.Entity("WebApplication1.Models.Course", b =>
+                {
+                    b.HasOne("WebApplication1.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("WebApplication1.Models.IdentityCard", b =>
                 {
                     b.HasOne("WebApplication1.Models.User", "User")
@@ -215,6 +269,25 @@ namespace WebApplication1.Migrations
                         .HasForeignKey("Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WebApplication1.Models.StudentCourse", b =>
+                {
+                    b.HasOne("WebApplication1.Models.Course", "Course")
+                        .WithMany("StudentCourse")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("WebApplication1.Models.User", "User")
+                        .WithMany("StudentCourse")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Course");
 
                     b.Navigation("User");
                 });
@@ -228,6 +301,16 @@ namespace WebApplication1.Migrations
                         .IsRequired();
 
                     b.Navigation("UserType");
+                });
+
+            modelBuilder.Entity("WebApplication1.Models.Course", b =>
+                {
+                    b.Navigation("StudentCourse");
+                });
+
+            modelBuilder.Entity("WebApplication1.Models.User", b =>
+                {
+                    b.Navigation("StudentCourse");
                 });
 
             modelBuilder.Entity("WebApplication1.Models.UserType", b =>

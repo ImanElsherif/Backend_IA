@@ -24,7 +24,6 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IDataRepository<User>, DataRepository<User>>();
 builder.Services.AddScoped<IDataRepository<UserType>, DataRepository<UserType>>();
-builder.Services.AddScoped<IDataRepository<Department>, DataRepository<Department>>();
 builder.Services.AddScoped<IDataRepository<IdentityCard>, DataRepository<IdentityCard>>();
 builder.Services.AddScoped<IDataRepository<Job>, DataRepository<Job>>();
 builder.Services.AddScoped<IDataRepository<Proposal>, DataRepository<Proposal>>();

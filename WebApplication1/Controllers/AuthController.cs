@@ -23,14 +23,13 @@ namespace WebApplication1.Controllers
         private readonly IAuthRepository _repo;
         private readonly IConfiguration _config;
         private readonly IDataRepository<UserType> _userTypeRepository;
-        private readonly IDataRepository<Department> _departmentRepository;
 
-        public AuthController(IAuthRepository repo, IConfiguration config, IDataRepository<UserType> userTypeRepository, IDataRepository<Department> departmentRepository)
+        public AuthController(IAuthRepository repo, IConfiguration config, IDataRepository<UserType> userTypeRepository)
         {
             _config = config;
             _repo = repo;
             _userTypeRepository = userTypeRepository;
-            _departmentRepository = departmentRepository;
+      
         }
 
         [HttpPost("login")]

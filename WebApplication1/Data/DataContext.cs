@@ -9,14 +9,11 @@ namespace WebApplication1.Data
         public DbSet<User> User { get; set; }
         public DbSet<UserType> UserType { get; set; }
         public DbSet<IdentityCard> IdentityCard { get; set; }
-        public DbSet<Department> Department { get; set; }
-        public DbSet<Course> Course { get; set; }
-        public DbSet<StudentCourse> StudentCourse { get; set; }
         public DbSet<Job> Jobs { get; set; }
         public DbSet<Proposal> Proposal { get; set; }
         public DbSet<SavedJob> SavedJob { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+/*        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<StudentCourse>().HasKey(sc => new {sc.UserId, sc.CourseId});
             modelBuilder.Entity<StudentCourse>()
@@ -30,6 +27,6 @@ namespace WebApplication1.Data
                 .WithMany(c => c.StudentCourse)
                 .HasForeignKey(sc => sc.CourseId)
                 .OnDelete(DeleteBehavior.Restrict);
-        }
+        }*/
     }
 }

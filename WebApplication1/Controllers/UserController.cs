@@ -15,17 +15,14 @@ namespace WebApplication1.Controllers
     {
         private readonly IDataRepository<User> _userRepository;
         private readonly IDataRepository<IdentityCard> _identityCardRepository;
-        private readonly IDataRepository<Department> _departmentRepository;
 
         public UserController(
             IDataRepository<User> userRepository, 
-            IDataRepository<IdentityCard> identityCardRepository,
-            IDataRepository<Department> departmentRepository
+            IDataRepository<IdentityCard> identityCardRepository
             )
         {
             _userRepository = userRepository;
             _identityCardRepository = identityCardRepository;
-            _departmentRepository = departmentRepository;
         }
 
 
