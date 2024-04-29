@@ -1,8 +1,14 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using WebApplication1.Data;
 using WebApplication1.Dtos;
@@ -16,7 +22,6 @@ namespace WebApplication1.Controllers
     {
         private readonly IAuthRepository _repo;
         private readonly IConfiguration _config;
-
         private readonly IDataRepository<UserType> _userTypeRepository;
         private readonly IDataRepository<Department> _departmentRepository;
 
@@ -46,8 +51,7 @@ namespace WebApplication1.Controllers
                 new Claim(ClaimTypes.Role, userFromRepo.UserType.Role),
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8
-                .GetBytes(_config.GetSection("AppSettings:Token").Value));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("AppSettings:Token").Value));
 
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
@@ -71,12 +75,6 @@ namespace WebApplication1.Controllers
         [HttpGet("register")]
         public async Task<IActionResult> Register()
         {
-         /*   var departments = await _departmentRepository.GetAllAsync();
-            if (departments == null || !departments.Any())
-            {
-                return NotFound("No departments found");
-            }*/
-
             var userTypes = await _userTypeRepository.GetAllAsync();
             if (userTypes == null || !userTypes.Any())
             {
@@ -85,14 +83,12 @@ namespace WebApplication1.Controllers
 
             return Ok(new
             {
-              /*  departments = departments,*/
                 roles = userTypes
             });
         }
 
-
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] UserDto userForRegisterDto)
+        public async Task<IActionResult> Register([FromForm] UserDto userForRegisterDto)
         {
             // Normalize email input
             userForRegisterDto.Email = userForRegisterDto.Email.ToLower();
@@ -117,18 +113,31 @@ namespace WebApplication1.Controllers
                 return BadRequest(new { errors = validationErrors });
             }
 
+            // Process profile picture
+            byte[] profilePicBytes = null;
+            string profilePicContentType = null;
+            if (userForRegisterDto.ProfilePic != null && userForRegisterDto.ProfilePic.Length > 0)
+            {
+                using (var ms = new MemoryStream())
+                {
+                    await userForRegisterDto.ProfilePic.CopyToAsync(ms);
+                    profilePicBytes = ms.ToArray();
+                    profilePicContentType = userForRegisterDto.ProfilePic.ContentType;
+                }
+            }
+
             var userToCreate = new User
             {
                 Name = userForRegisterDto.Name,
                 Email = userForRegisterDto.Email,
                 UserTypeId = userForRegisterDto.UserTypeId,
-                // Initialize fields that may be assigned conditionally
-                CompanyDescription = userType.Role == "employer" ? userForRegisterDto.CompanyDescription : null,
-                ContactInfo = userType.Role == "employer" ? userForRegisterDto.ContactInfo : null,
-                Skills = userType.Role == "job seeker" ? userForRegisterDto.Skills : null,
-                ProfilePic = userType.Role == "job seeker" ? userForRegisterDto.ProfilePic : null,
-                Age = userType.Role == "job seeker" ? userForRegisterDto.Age : 0,
-                DescriptionBio = userType.Role == "job seeker" ? userForRegisterDto.DescriptionBio : null,
+                CompanyDescription = userForRegisterDto.CompanyDescription,
+                ContactInfo = userForRegisterDto.ContactInfo,
+                Skills = userForRegisterDto.Skills,
+                ProfilePic = profilePicBytes,
+                ProfilePicContentType = profilePicContentType,
+                Age = userForRegisterDto.Age,
+                DescriptionBio = userForRegisterDto.DescriptionBio
             };
 
             await _repo.Register(userToCreate, userForRegisterDto.Password);
@@ -149,7 +158,7 @@ namespace WebApplication1.Controllers
                 case "job seeker":
                     if (string.IsNullOrWhiteSpace(dto.Skills))
                         errors.Add("The Skills field is required for job seekers.");
-                    if (string.IsNullOrWhiteSpace(dto.ProfilePic))
+                    if (string.IsNullOrWhiteSpace(dto.ProfilePic?.FileName)) // Check if ProfilePic is uploaded
                         errors.Add("The ProfilePic field is required for job seekers.");
                     if (string.IsNullOrWhiteSpace(dto.DescriptionBio))
                         errors.Add("The DescriptionBio field is required for job seekers.");
@@ -159,10 +168,5 @@ namespace WebApplication1.Controllers
             }
             return !errors.Any();
         }
-
-
-
-
     }
-
 }

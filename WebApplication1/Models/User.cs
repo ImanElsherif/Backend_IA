@@ -30,7 +30,8 @@ namespace WebApplication1.Models
 
         //job seeker
         public string? Skills { get; set; }
-        public string? ProfilePic { get; set; }
+        public byte[]? ProfilePic { get; set; }
+        public string? ProfilePicContentType { get; set; }
         public int? Age { get; set; }
         public string? DescriptionBio { get; set; }
 

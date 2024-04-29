@@ -98,6 +98,27 @@ namespace WebApplication1.Controllers
             return Ok(userDto);
         }
 
+        [HttpGet("seeker/{id}")]
+        public async Task<IActionResult> Getseeker(int id)
+        {
+            var user = await _userRepository.GetByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            var userDto = new
+            {
+                Name = user.Name,
+                Email = user.Email,
+                Skills = user.Skills, 
+                ProfilePic = user.ProfilePic,
+                Age = user.Age,
+                DescriptionBio=user.DescriptionBio,
+            };
+
+            return Ok(userDto);
+        }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
@@ -120,46 +141,10 @@ namespace WebApplication1.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error deleting data");
             }
         }
-        /*
-                [HttpPut("{id}")]
-                public async Task<IActionResult> UpdateUser(int id, [FromBody] UserDto userDto)
-                {
-                    if (userDto == null || id != userDto.Id)
-                    {
-                        return BadRequest("User data is invalid");
-                    }
 
-                    var existingUser = await _userRepository.GetByIdAsync(id);
-                    if (existingUser == null)
-                    {
-                        return NotFound($"User with ID {id} not found.");
-                    }
-
-                    // Map the DTO to your domain model
-                    existingUser.Name = userDto.Name;
-                    existingUser.Email = userDto.Email;
-
-
-
-                    // Add other fields as necessary
-
-                    try
-                    {
-                        _userRepository.UpdateAsync(existingUser);
-                        await _userRepository.Save();
-                        return NoContent(); // Or return Ok if you prefer to return the updated object
-                    }
-                    catch (Exception ex)
-                    {
-                        // Log the exception if necessary
-                        return StatusCode(StatusCodes.Status500InternalServerError, "Error updating user");
-                    }
-                }*/
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UserDto userDto)
         {
-        
-
             // Retrieve the existing user from the repository
             var existingUser = await _userRepository.GetByIdAsync(id);
             if (existingUser == null)
@@ -168,7 +153,7 @@ namespace WebApplication1.Controllers
                 return NotFound($"User with ID {id} not found.");
             }
 
-            // Update only the name and email fields of the existing user
+            // Update only the name, email, company description, and contact info fields of the existing user
             existingUser.Name = userDto.Name;
             existingUser.Email = userDto.Email;
             existingUser.CompanyDescription = userDto.CompanyDescription;
@@ -182,16 +167,20 @@ namespace WebApplication1.Controllers
                 existingUser.PasswordHash = HashPassword(userDto.Password);
             }
 
-            // Explicitly assign the values of other fields from existingUser to userDto
-            userDto.Skills = existingUser.Skills;
-            userDto.ProfilePic = existingUser.ProfilePic;
-            userDto.Age = existingUser.Age;
-            userDto.DescriptionBio = existingUser.DescriptionBio;
-            userDto.UserTypeId = existingUser.UserTypeId; // Assuming UserTypeId should not be changed
+            // Check if ProfilePic is not null, indicating a profile picture update
+            if (userDto.ProfilePic != null)
+            {
+                // Convert the uploaded file to a byte array and assign it to ProfilePic
+                using (var ms = new MemoryStream())
+                {
+                    await userDto.ProfilePic.CopyToAsync(ms);
+                    existingUser.ProfilePic = ms.ToArray();
+                }
+            }
 
+            // Save the changes to the database
             try
             {
-                // Save the changes to the database
                 await _userRepository.Save();
                 return NoContent(); // Or return Ok if you prefer to return the updated object
             }
@@ -201,6 +190,7 @@ namespace WebApplication1.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error updating user");
             }
         }
+
 
         // Example method for hashing password (replace with appropriate implementation)
         private byte[] HashPassword(string password)
