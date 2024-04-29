@@ -17,13 +17,14 @@ namespace WebApplication1.Controllers
         {
             _savedJobRepository = savedJobRepository;
         }
+
         [HttpPost]
         public async Task<IActionResult> SaveJob(SavedJobDto savedJobDto)
         {
             try
             {
-                // Check if the user has already saved the job
-                var existingSavedJob = await _savedJobRepository.GetByCustomCriteria(job => job.UserId == savedJobDto.UserId && job.JobId == savedJobDto.JobId);
+                var existingSavedJob = await _savedJobRepository.GetByCustomCriteria(
+                    job => job.UserId == savedJobDto.UserId && job.JobId == savedJobDto.JobId);
 
                 if (existingSavedJob != null)
                 {
@@ -48,7 +49,6 @@ namespace WebApplication1.Controllers
             }
         }
 
-
         [HttpGet("{userId}")]
         public async Task<IActionResult> GetSavedJobs(int userId)
         {
@@ -60,6 +60,28 @@ namespace WebApplication1.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"Failed to retrieve saved jobs: {ex.Message}");
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteSavedJob(int id)
+        {
+            try
+            {
+                var savedJob = await _savedJobRepository.GetByIdAsync(id);
+                if (savedJob == null)
+                {
+                    return NotFound("Saved job not found.");
+                }
+
+                await _savedJobRepository.DeleteAsync(savedJob);
+                await _savedJobRepository.Save();
+
+                return Ok("Saved job deleted successfully.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Failed to delete the saved job: {ex.Message}");
             }
         }
     }

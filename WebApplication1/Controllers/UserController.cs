@@ -167,6 +167,7 @@ namespace WebApplication1.Controllers
                 existingUser.PasswordHash = HashPassword(userDto.Password);
             }
 
+<<<<<<< HEAD
             // Check if ProfilePic is not null, indicating a profile picture update
             if (userDto.ProfilePic != null)
             {
@@ -177,6 +178,15 @@ namespace WebApplication1.Controllers
                     existingUser.ProfilePic = ms.ToArray();
                 }
             }
+=======
+            // Explicitly assign the values of other fields from existingUser to userDto
+
+            userDto.Skills = existingUser.Skills;
+            userDto.ProfilePic = existingUser.ProfilePic;
+            userDto.Age = existingUser.Age;
+            userDto.DescriptionBio = existingUser.DescriptionBio;
+            userDto.UserTypeId = existingUser.UserTypeId; // Assuming UserTypeId should not be changed
+>>>>>>> 36e0471e0868a5108f4cc898e2e415d01a32fe85
 
             // Save the changes to the database
             try
