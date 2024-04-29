@@ -107,18 +107,22 @@ namespace WebApplication1.Controllers
                 return NotFound("User not found");
             }
 
+            // Convert profile picture byte array to base64 string
+            var profilePicBase64 = Convert.ToBase64String(user.ProfilePic);
+
             var userDto = new
             {
                 Name = user.Name,
                 Email = user.Email,
-                Skills = user.Skills, 
-                ProfilePic = user.ProfilePic,
+                Skills = user.Skills,
+                ProfilePic = profilePicBase64, // Use the base64-encoded string
                 Age = user.Age,
-                DescriptionBio=user.DescriptionBio,
+                DescriptionBio = user.DescriptionBio,
             };
 
             return Ok(userDto);
         }
+
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
@@ -162,12 +166,13 @@ namespace WebApplication1.Controllers
             // Check if the password field in the userDto is not null, indicating a password update
             if (!string.IsNullOrEmpty(userDto.Password))
             {
-                // You should implement a method to hash the password before storing it
-                // For simplicity, I'm assuming you have a method called HashPassword
-                existingUser.PasswordHash = HashPassword(userDto.Password);
+                // Use the CreatePasswordHash method from AuthRepository to hash the password
+                byte[] passwordHash, passwordSalt;
+                CreatePasswordHash(userDto.Password, out passwordHash, out passwordSalt);
+                existingUser.PasswordHash = passwordHash;
+                existingUser.PasswordSalt = passwordSalt;
             }
 
-<<<<<<< HEAD
             // Check if ProfilePic is not null, indicating a profile picture update
             if (userDto.ProfilePic != null)
             {
@@ -178,15 +183,6 @@ namespace WebApplication1.Controllers
                     existingUser.ProfilePic = ms.ToArray();
                 }
             }
-=======
-            // Explicitly assign the values of other fields from existingUser to userDto
-
-            userDto.Skills = existingUser.Skills;
-            userDto.ProfilePic = existingUser.ProfilePic;
-            userDto.Age = existingUser.Age;
-            userDto.DescriptionBio = existingUser.DescriptionBio;
-            userDto.UserTypeId = existingUser.UserTypeId; // Assuming UserTypeId should not be changed
->>>>>>> 36e0471e0868a5108f4cc898e2e415d01a32fe85
 
             // Save the changes to the database
             try
@@ -200,15 +196,13 @@ namespace WebApplication1.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error updating user");
             }
         }
-
-
-        // Example method for hashing password (replace with appropriate implementation)
-        private byte[] HashPassword(string password)
+        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
-            // You should use a secure hashing algorithm like bcrypt
-            // For simplicity, I'm just using a basic hashing function
-            var sha256 = System.Security.Cryptography.SHA256.Create();
-            return sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+            using (var hmac = new System.Security.Cryptography.HMACSHA512())
+            {
+                passwordSalt = hmac.Key;
+                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            }
         }
 
 
