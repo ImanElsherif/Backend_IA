@@ -6,8 +6,7 @@ namespace WebApplication1.Models
     public class User
     {
         [Key]
-        public int Id { get; set; }
-        public string Name { get; set; }
+        public virtual int Id { get; set; } // Make Id property virtual
         public string Email { get; set; }
         public byte[] PasswordHash { get; set; }
         public byte[] PasswordSalt { get; set; }
@@ -17,18 +16,6 @@ namespace WebApplication1.Models
         public int UserTypeId { get; set; }
         public UserType UserType { get; set; }
 
-
-
-        //emp
-        public string? CompanyDescription { get; set; }
-        public string? ContactInfo { get; set; }
-
-        //job seeker
-        public string? Skills { get; set; }
-        public byte[]? ProfilePic { get; set; }
-        public string? ProfilePicContentType { get; set; }
-        public int? Age { get; set; }
-        public string? DescriptionBio { get; set; }
-
     }
 }
+

@@ -15,14 +15,19 @@ namespace WebApplication1.Controllers
     {
         private readonly IDataRepository<User> _userRepository;
         private readonly IDataRepository<IdentityCard> _identityCardRepository;
-
+        private readonly IDataRepository<Employer> _employerRepository;
+        private readonly IDataRepository<JobSeeker> _jobSeekerRepository;
         public UserController(
             IDataRepository<User> userRepository, 
-            IDataRepository<IdentityCard> identityCardRepository
+            IDataRepository<IdentityCard> identityCardRepository,
+            IDataRepository<Employer> employerRepository,
+            IDataRepository<JobSeeker> jobSeekerRepository
             )
         {
             _userRepository = userRepository;
             _identityCardRepository = identityCardRepository;
+            _employerRepository = employerRepository;
+            _jobSeekerRepository = jobSeekerRepository;
         }
 
 
@@ -37,88 +42,88 @@ namespace WebApplication1.Controllers
             return Ok(users);
         }
 
-        [HttpGet("employers")]
-        public async Task<IActionResult> GetEmployers()
-        {
-            // You would need to know the ID or criteria that defines an employer
-            // Example: assuming 'employer' role is user type id 3
-            const int employerTypeId = 5; // This should be dynamically retrieved or configured if possible
+ [HttpGet("employers")]
+public async Task<IActionResult> GetEmployers()
+{
+    var employers = await _employerRepository.GetAllAsync();
 
-            var employers = await _userRepository.GetAllAsync(u => u.UserTypeId == employerTypeId);
-            if (employers == null || !employers.Any())
+    if (employers == null || !employers.Any())
+    {
+        return NotFound("No employers found.");
+    }
+
+    return Ok(employers);
+}
+
+        /*        [HttpGet("{id}")]
+                public async Task<IActionResult> GetUser(int id)
+                {
+                    var user = await _userRepository.GetByIdAsync(id);
+                    if (user == null)
+                    {
+                        return NotFound("User not found");
+                    }
+
+                    var userDto = new
+                    {
+                        Name = user.Name,
+                        Email = user.Email,
+                        CompanyDescription = user.CompanyDescription, // Assuming user has CompanyDescription property
+                        ContactInfo = user.ContactInfo // Assuming user has ContactInfo property
+                    };
+
+                    return Ok(userDto);
+                }*/
+
+        [HttpGet("employer/{id}")]
+        public async Task<IActionResult> Getemployer(int id)
+        {
+            var employer = await _employerRepository.GetByIdAsync(id);
+            if (employer == null)
             {
-                return NotFound("No employers found.");
+                return NotFound("Job seeker not found");
             }
 
-            return Ok(employers);
-        }
-
-
-
-
-        /*     [HttpGet("{id}")]
-             public async Task<IActionResult> GetUserWithDepartment(int id)
-             {
-                 var user = await _userRepository.GetByIdAsync(id);
-                 if (user == null)
-                 {
-                     return NotFound();
-                 }
-
-                 var department = await _departmentRepository.GetByIdAsync(user.DepartmentId);
-                 if (department == null)
-                 {
-                     return NotFound("Department not found");
-                 }
-
-                 user.Department = department;
-
-                 return Ok(user);
-             }*/
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetUser(int id)
-        {
-            var user = await _userRepository.GetByIdAsync(id);
-            if (user == null)
+      
+            var jobSeekerDto = new
             {
-                return NotFound("User not found");
-            }
-
-            var userDto = new
-            {
-                Name = user.Name,
-                Email = user.Email,
-                CompanyDescription = user.CompanyDescription, // Assuming user has CompanyDescription property
-                ContactInfo = user.ContactInfo // Assuming user has ContactInfo property
+                CompanyName = employer.CompanyName,
+                Email = employer.Email,
+                CompanyDescription = employer.CompanyDescription,
+                ContactInfo = employer.ContactInfo,
+             
             };
 
-            return Ok(userDto);
+            return Ok(jobSeekerDto);
         }
+
 
         [HttpGet("seeker/{id}")]
         public async Task<IActionResult> Getseeker(int id)
         {
-            var user = await _userRepository.GetByIdAsync(id);
-            if (user == null)
+            var jobSeeker = await _jobSeekerRepository.GetByIdAsync(id);
+            if (jobSeeker == null)
             {
-                return NotFound("User not found");
+                return NotFound("Job seeker not found");
             }
 
             // Convert profile picture byte array to base64 string
-            var profilePicBase64 = Convert.ToBase64String(user.ProfilePic);
+            var profilePicBase64 = Convert.ToBase64String(jobSeeker.ProfilePic);
 
-            var userDto = new
+            var jobSeekerDto = new
             {
-                Name = user.Name,
-                Email = user.Email,
-                Skills = user.Skills,
+                Name = jobSeeker.Name,
+                Email = jobSeeker.Email,
+                Skills = jobSeeker.Skills,
                 ProfilePic = profilePicBase64, // Use the base64-encoded string
-                Age = user.Age,
-                DescriptionBio = user.DescriptionBio,
+                Age = jobSeeker.Age,
+                DescriptionBio = jobSeeker.DescriptionBio,
             };
 
-            return Ok(userDto);
+            return Ok(jobSeekerDto);
         }
+
+
 
 
         [HttpDelete("{id}")]
@@ -143,11 +148,34 @@ namespace WebApplication1.Controllers
             }
         }
 
+        [HttpDelete("employer/{id}")]
+        public async Task<IActionResult> DeleteEmployer(int id)
+        {
+            try
+            {
+                var employer = await _employerRepository.GetByIdAsync(id);
+                if (employer == null)
+                {
+                    return NotFound($"Employer with ID {id} not found.");
+                }
+
+                await _employerRepository.DeleteAsync(employer);
+                await _employerRepository.Save();
+                return NoContent(); // Successful response with no content, indicating the deletion was successful
+            }
+            catch (Exception ex)
+            {
+                // Log the exception if necessary
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error deleting employer");
+            }
+        }
+
+
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(int id, [FromBody] UserDto userDto)
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] EmployerDto userDto)
         {
             // Retrieve the existing user from the repository
-            var existingUser = await _userRepository.GetByIdAsync(id);
+            var existingUser = await _employerRepository.GetByIdAsync(id);
             if (existingUser == null)
             {
                 // If the user with the specified ID doesn't exist, return NotFound
@@ -155,7 +183,7 @@ namespace WebApplication1.Controllers
             }
 
             // Update only the name, email, company description, and contact info fields of the existing user
-            existingUser.Name = userDto.Name;
+            existingUser.CompanyName = userDto.CompanyName;
             existingUser.Email = userDto.Email;
             existingUser.CompanyDescription = userDto.CompanyDescription;
             existingUser.ContactInfo = userDto.ContactInfo;
@@ -170,7 +198,7 @@ namespace WebApplication1.Controllers
                 existingUser.PasswordSalt = passwordSalt;
             }
 
-            // Check if ProfilePic is not null, indicating a profile picture update
+         /*   // Check if ProfilePic is not null, indicating a profile picture update
             if (userDto.ProfilePic != null)
             {
                 // Convert the uploaded file to a byte array and assign it to ProfilePic
@@ -179,12 +207,12 @@ namespace WebApplication1.Controllers
                     await userDto.ProfilePic.CopyToAsync(ms);
                     existingUser.ProfilePic = ms.ToArray();
                 }
-            }
+            }*/
 
             // Save the changes to the database
             try
             {
-                await _userRepository.Save();
+                await _employerRepository.Save();
                 return NoContent(); // Or return Ok if you prefer to return the updated object
             }
             catch (Exception ex)

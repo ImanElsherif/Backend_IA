@@ -74,7 +74,7 @@ namespace WebApplication1.Controllers
             {
                 JobId = proposalDto.JobId,
                 JobSeekerId = proposalDto.JobSeekerId,
-                EmployerId = proposalDto.EmployerId,
+                EmpId = proposalDto.EmployerId,
                 Attachment = filePath, // Save the file path in the database
                 Status = "Pending" // Set the status of the proposal
             };
@@ -151,7 +151,7 @@ namespace WebApplication1.Controllers
         [HttpGet("employer/{employerId}")]
         public async Task<IActionResult> GetProposalsByEmployerId(int employerId)
         {
-            var proposals = await _proposalRepository.GetAllAsync(p => p.EmployerId == employerId);
+            var proposals = await _proposalRepository.GetAllAsync(p => p.EmpId == employerId);
             return Ok(proposals);
         }
 

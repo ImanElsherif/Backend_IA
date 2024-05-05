@@ -8,7 +8,7 @@ namespace WebApplication1.Models
         [Key]
         public int SavedJobId { get; set; }
 
-        [ForeignKey("User")]
+        [ForeignKey("JobSeeker")]
         public int UserId { get; set; }
 
         [ForeignKey("Job")]

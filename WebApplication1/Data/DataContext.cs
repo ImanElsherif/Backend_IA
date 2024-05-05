@@ -7,26 +7,77 @@ namespace WebApplication1.Data
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
         public DbSet<User> User { get; set; }
+        public DbSet<Employer> Employer { get; set; }
+        public DbSet<JobSeeker> JobSeeker { get; set; }
         public DbSet<UserType> UserType { get; set; }
         public DbSet<IdentityCard> IdentityCard { get; set; }
         public DbSet<Job> Jobs { get; set; }
         public DbSet<Proposal> Proposal { get; set; }
         public DbSet<SavedJob> SavedJob { get; set; }
 
-/*        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        /*        protected override void OnModelCreating(ModelBuilder modelBuilder)
+                {
+                    modelBuilder.Entity<StudentCourse>().HasKey(sc => new {sc.UserId, sc.CourseId});
+                    modelBuilder.Entity<StudentCourse>()
+                        .HasOne(sc => sc.User)
+                        .WithMany(s => s.StudentCourse)
+                        .HasForeignKey(sc => sc.UserId)
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    modelBuilder.Entity<StudentCourse>()
+                        .HasOne(sc => sc.Course)
+                        .WithMany(c => c.StudentCourse)
+                        .HasForeignKey(sc => sc.CourseId)
+                        .OnDelete(DeleteBehavior.Restrict);
+                }*/
+  
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<StudentCourse>().HasKey(sc => new {sc.UserId, sc.CourseId});
-            modelBuilder.Entity<StudentCourse>()
-                .HasOne(sc => sc.User)
-                .WithMany(s => s.StudentCourse)
-                .HasForeignKey(sc => sc.UserId)
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Employer>().ToTable("Employers");
+            modelBuilder.Entity<JobSeeker>().ToTable("JobSeekers");
+            modelBuilder.Entity<Job>().ToTable("Jobs");
+            modelBuilder.Entity<Proposal>().ToTable("Proposals");
+
+
+            modelBuilder.Entity<Employer>()
+                .HasOne(e => e.User)
+                .WithOne()
+                .HasForeignKey<Employer>(e => e.Id);
+
+            modelBuilder.Entity<JobSeeker>()
+                .HasOne(js => js.User)
+                .WithOne()
+                .HasForeignKey<JobSeeker>(js => js.Id);
+            
+            // Configure one-to-many relationship between Employer and Job
+            modelBuilder.Entity<Job>()
+                .HasOne(j => j.Employer)
+                .WithMany(e => e.Jobs) // One Employer can have many Jobs
+                .HasForeignKey(j => j.EmployerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<StudentCourse>()
-                .HasOne(sc => sc.Course)
-                .WithMany(c => c.StudentCourse)
-                .HasForeignKey(sc => sc.CourseId)
+            // Configure many-to-one relationship between Proposal and Employer
+            modelBuilder.Entity<Proposal>()
+                .HasOne(p => p.Employer)
+                .WithMany(e => e.Proposals)
+                .HasForeignKey(p => p.EmpId)
                 .OnDelete(DeleteBehavior.Restrict);
-        }*/
+
+            // Configure many-to-one relationship between Proposal and Job
+            modelBuilder.Entity<Proposal>()
+                .HasOne(p => p.Job)
+                .WithMany(j => j.Proposals)
+                .HasForeignKey(p => p.JobId)
+                .OnDelete(DeleteBehavior.Restrict);
+            
+            // Configure many-to-one relationship between Proposal and Job
+            modelBuilder.Entity<Proposal>()
+                .HasOne(p => p.JobSeeker)
+                .WithMany(js => js.Proposals)
+                .HasForeignKey(p => p.JobSeekerId)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
     }
 }

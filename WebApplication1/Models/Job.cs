@@ -9,9 +9,11 @@ namespace WebApplication1.Models
         [Key]
         public int JobId { get; set; }
 
-        [ForeignKey("User")]
+        public ICollection<Proposal> Proposals { get; set; }
         public int EmployerId { get; set; }
-       
+        
+        [ForeignKey("EmployerId")]
+        public Employer Employer { get; set; }
 
         [Required]
         public string JobTitle { get; set; }

@@ -9,8 +9,6 @@ namespace WebApplication1.Dtos
     public class UserDto
     {
 
-        [Required]
-        public string Name { get; set; }
 
         [Required]
         [EmailAddress]
@@ -24,17 +22,5 @@ namespace WebApplication1.Dtos
         public int UserTypeId { get; set; }
 
 
-        // Employer-specific fields
-        // Optional fields do not use the [Required] attribute and are marked as nullable
-        public string? CompanyDescription { get; set; }
-        public string? ContactInfo { get; set; }
-
-        //seeker
-        public string? Skills { get; set; }
-        public IFormFile? ProfilePic { get; set; }
-        public int? Age { get; set; }
-        public string? DescriptionBio { get; set; }
-
-        public int Id { get; internal set; }
     }
 }

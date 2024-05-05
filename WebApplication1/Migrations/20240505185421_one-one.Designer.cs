@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApplication1.Data;
 
@@ -11,9 +12,11 @@ using WebApplication1.Data;
 namespace WebApplication1.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240505185421_one-one")]
+    partial class oneone
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -81,9 +84,7 @@ namespace WebApplication1.Migrations
 
                     b.HasKey("JobId");
 
-                    b.HasIndex("EmployerId");
-
-                    b.ToTable("Jobs", (string)null);
+                    b.ToTable("Jobs");
                 });
 
             modelBuilder.Entity("WebApplication1.Models.Proposal", b =>
@@ -98,7 +99,7 @@ namespace WebApplication1.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("EmpId")
+                    b.Property<int>("EmployerId")
                         .HasColumnType("int");
 
                     b.Property<int>("JobId")
@@ -113,13 +114,7 @@ namespace WebApplication1.Migrations
 
                     b.HasKey("ProposalId");
 
-                    b.HasIndex("EmpId");
-
-                    b.HasIndex("JobId");
-
-                    b.HasIndex("JobSeekerId");
-
-                    b.ToTable("Proposals", (string)null);
+                    b.ToTable("Proposal");
                 });
 
             modelBuilder.Entity("WebApplication1.Models.SavedJob", b =>
@@ -249,44 +244,6 @@ namespace WebApplication1.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("WebApplication1.Models.Job", b =>
-                {
-                    b.HasOne("WebApplication1.Models.Employer", "Employer")
-                        .WithMany("Jobs")
-                        .HasForeignKey("EmployerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Employer");
-                });
-
-            modelBuilder.Entity("WebApplication1.Models.Proposal", b =>
-                {
-                    b.HasOne("WebApplication1.Models.Employer", "Employer")
-                        .WithMany("Proposals")
-                        .HasForeignKey("EmpId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("WebApplication1.Models.Job", "Job")
-                        .WithMany("Proposals")
-                        .HasForeignKey("JobId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("WebApplication1.Models.JobSeeker", "JobSeeker")
-                        .WithMany("Proposals")
-                        .HasForeignKey("JobSeekerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Employer");
-
-                    b.Navigation("Job");
-
-                    b.Navigation("JobSeeker");
-                });
-
             modelBuilder.Entity("WebApplication1.Models.User", b =>
                 {
                     b.HasOne("WebApplication1.Models.UserType", "UserType")
@@ -320,26 +277,9 @@ namespace WebApplication1.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("WebApplication1.Models.Job", b =>
-                {
-                    b.Navigation("Proposals");
-                });
-
             modelBuilder.Entity("WebApplication1.Models.UserType", b =>
                 {
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("WebApplication1.Models.Employer", b =>
-                {
-                    b.Navigation("Jobs");
-
-                    b.Navigation("Proposals");
-                });
-
-            modelBuilder.Entity("WebApplication1.Models.JobSeeker", b =>
-                {
-                    b.Navigation("Proposals");
                 });
 #pragma warning restore 612, 618
         }

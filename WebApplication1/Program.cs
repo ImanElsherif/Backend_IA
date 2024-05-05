@@ -28,6 +28,8 @@ builder.Services.AddScoped<IDataRepository<IdentityCard>, DataRepository<Identit
 builder.Services.AddScoped<IDataRepository<Job>, DataRepository<Job>>();
 builder.Services.AddScoped<IDataRepository<Proposal>, DataRepository<Proposal>>();
 builder.Services.AddScoped<IDataRepository<SavedJob>, DataRepository<SavedJob>>();
+builder.Services.AddScoped<IDataRepository<Employer>, DataRepository<Employer>>();
+builder.Services.AddScoped<IDataRepository<JobSeeker>, DataRepository<JobSeeker>>();
 
 builder.Services.AddControllersWithViews().AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles);
 builder.Services.AddAuthentication(opt =>
