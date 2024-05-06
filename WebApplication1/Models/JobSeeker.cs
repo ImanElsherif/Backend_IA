@@ -14,5 +14,6 @@ namespace WebApplication1.Models
       
         public User User { get; set; }
         public ICollection<Proposal> Proposals { get; set; }
+        public ICollection<SavedJob> SavedJobs { get; set; }
     }
 }

@@ -10,6 +10,7 @@ namespace WebApplication1.Models
         public int JobId { get; set; }
 
         public ICollection<Proposal> Proposals { get; set; }
+        public ICollection<SavedJob> SavedJobs { get; set; }
         public int EmployerId { get; set; }
         
         [ForeignKey("EmployerId")]

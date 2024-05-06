@@ -136,12 +136,16 @@ namespace WebApplication1.Migrations
                     b.Property<int>("JobId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
+                    b.Property<int>("JobSeekerId")
                         .HasColumnType("int");
 
                     b.HasKey("SavedJobId");
 
-                    b.ToTable("SavedJob");
+                    b.HasIndex("JobId");
+
+                    b.HasIndex("JobSeekerId");
+
+                    b.ToTable("SavedJobs", (string)null);
                 });
 
             modelBuilder.Entity("WebApplication1.Models.User", b =>
@@ -287,6 +291,25 @@ namespace WebApplication1.Migrations
                     b.Navigation("JobSeeker");
                 });
 
+            modelBuilder.Entity("WebApplication1.Models.SavedJob", b =>
+                {
+                    b.HasOne("WebApplication1.Models.Job", "Job")
+                        .WithMany("SavedJobs")
+                        .HasForeignKey("JobId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("WebApplication1.Models.JobSeeker", "JobSeeker")
+                        .WithMany("SavedJobs")
+                        .HasForeignKey("JobSeekerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Job");
+
+                    b.Navigation("JobSeeker");
+                });
+
             modelBuilder.Entity("WebApplication1.Models.User", b =>
                 {
                     b.HasOne("WebApplication1.Models.UserType", "UserType")
@@ -323,6 +346,8 @@ namespace WebApplication1.Migrations
             modelBuilder.Entity("WebApplication1.Models.Job", b =>
                 {
                     b.Navigation("Proposals");
+
+                    b.Navigation("SavedJobs");
                 });
 
             modelBuilder.Entity("WebApplication1.Models.UserType", b =>
@@ -340,6 +365,8 @@ namespace WebApplication1.Migrations
             modelBuilder.Entity("WebApplication1.Models.JobSeeker", b =>
                 {
                     b.Navigation("Proposals");
+
+                    b.Navigation("SavedJobs");
                 });
 #pragma warning restore 612, 618
         }

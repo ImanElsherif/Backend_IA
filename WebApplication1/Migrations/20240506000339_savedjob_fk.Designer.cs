@@ -12,8 +12,8 @@ using WebApplication1.Data;
 namespace WebApplication1.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240505172613_fk2")]
-    partial class fk2
+    [Migration("20240506000339_savedjob_fk")]
+    partial class savedjob_fk
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -84,7 +84,9 @@ namespace WebApplication1.Migrations
 
                     b.HasKey("JobId");
 
-                    b.ToTable("Jobs");
+                    b.HasIndex("EmployerId");
+
+                    b.ToTable("Jobs", (string)null);
                 });
 
             modelBuilder.Entity("WebApplication1.Models.Proposal", b =>
@@ -99,7 +101,7 @@ namespace WebApplication1.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("EmployerId")
+                    b.Property<int>("EmpId")
                         .HasColumnType("int");
 
                     b.Property<int>("JobId")
@@ -114,7 +116,13 @@ namespace WebApplication1.Migrations
 
                     b.HasKey("ProposalId");
 
-                    b.ToTable("Proposal");
+                    b.HasIndex("EmpId");
+
+                    b.HasIndex("JobId");
+
+                    b.HasIndex("JobSeekerId");
+
+                    b.ToTable("Proposals", (string)null);
                 });
 
             modelBuilder.Entity("WebApplication1.Models.SavedJob", b =>
@@ -131,12 +139,16 @@ namespace WebApplication1.Migrations
                     b.Property<int>("JobId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
+                    b.Property<int>("JobSeekerId")
                         .HasColumnType("int");
 
                     b.HasKey("SavedJobId");
 
-                    b.ToTable("SavedJob");
+                    b.HasIndex("JobId");
+
+                    b.HasIndex("JobSeekerId");
+
+                    b.ToTable("SavedJobs", (string)null);
                 });
 
             modelBuilder.Entity("WebApplication1.Models.User", b =>
@@ -230,11 +242,6 @@ namespace WebApplication1.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasIndex("UserId");
-
                     b.ToTable("JobSeekers", (string)null);
                 });
 
@@ -247,6 +254,63 @@ namespace WebApplication1.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WebApplication1.Models.Job", b =>
+                {
+                    b.HasOne("WebApplication1.Models.Employer", "Employer")
+                        .WithMany("Jobs")
+                        .HasForeignKey("EmployerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Employer");
+                });
+
+            modelBuilder.Entity("WebApplication1.Models.Proposal", b =>
+                {
+                    b.HasOne("WebApplication1.Models.Employer", "Employer")
+                        .WithMany("Proposals")
+                        .HasForeignKey("EmpId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("WebApplication1.Models.Job", "Job")
+                        .WithMany("Proposals")
+                        .HasForeignKey("JobId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("WebApplication1.Models.JobSeeker", "JobSeeker")
+                        .WithMany("Proposals")
+                        .HasForeignKey("JobSeekerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Employer");
+
+                    b.Navigation("Job");
+
+                    b.Navigation("JobSeeker");
+                });
+
+            modelBuilder.Entity("WebApplication1.Models.SavedJob", b =>
+                {
+                    b.HasOne("WebApplication1.Models.Job", "Job")
+                        .WithMany("SavedJobs")
+                        .HasForeignKey("JobId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("WebApplication1.Models.JobSeeker", "JobSeeker")
+                        .WithMany("SavedJobs")
+                        .HasForeignKey("JobSeekerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Job");
+
+                    b.Navigation("JobSeeker");
                 });
 
             modelBuilder.Entity("WebApplication1.Models.User", b =>
@@ -263,9 +327,9 @@ namespace WebApplication1.Migrations
             modelBuilder.Entity("WebApplication1.Models.Employer", b =>
                 {
                     b.HasOne("WebApplication1.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("Id")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .WithOne()
+                        .HasForeignKey("WebApplication1.Models.Employer", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -273,24 +337,39 @@ namespace WebApplication1.Migrations
 
             modelBuilder.Entity("WebApplication1.Models.JobSeeker", b =>
                 {
-                    b.HasOne("WebApplication1.Models.User", null)
+                    b.HasOne("WebApplication1.Models.User", "User")
                         .WithOne()
                         .HasForeignKey("WebApplication1.Models.JobSeeker", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("WebApplication1.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WebApplication1.Models.Job", b =>
+                {
+                    b.Navigation("Proposals");
+
+                    b.Navigation("SavedJobs");
                 });
 
             modelBuilder.Entity("WebApplication1.Models.UserType", b =>
                 {
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WebApplication1.Models.Employer", b =>
+                {
+                    b.Navigation("Jobs");
+
+                    b.Navigation("Proposals");
+                });
+
+            modelBuilder.Entity("WebApplication1.Models.JobSeeker", b =>
+                {
+                    b.Navigation("Proposals");
+
+                    b.Navigation("SavedJobs");
                 });
 #pragma warning restore 612, 618
         }

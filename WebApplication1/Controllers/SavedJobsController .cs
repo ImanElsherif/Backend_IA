@@ -24,7 +24,7 @@ namespace WebApplication1.Controllers
             try
             {
                 var existingSavedJob = await _savedJobRepository.GetByCustomCriteria(
-                    job => job.UserId == savedJobDto.UserId && job.JobId == savedJobDto.JobId);
+                    job => job.JobSeekerId == savedJobDto.UserId && job.JobId == savedJobDto.JobId);
 
                 if (existingSavedJob != null)
                 {
@@ -33,7 +33,7 @@ namespace WebApplication1.Controllers
 
                 var savedJob = new SavedJob
                 {
-                    UserId = savedJobDto.UserId,
+                    JobSeekerId = savedJobDto.UserId,
                     JobId = savedJobDto.JobId,
                     DateSaved = DateTime.Now
                 };
@@ -54,7 +54,7 @@ namespace WebApplication1.Controllers
         {
             try
             {
-                var savedJobs = await _savedJobRepository.GetAllAsync(job => job.UserId == userId);
+                var savedJobs = await _savedJobRepository.GetAllAsync(job => job.JobSeekerId == userId);
                 return Ok(savedJobs);
             }
             catch (Exception ex)

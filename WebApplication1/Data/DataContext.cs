@@ -14,22 +14,6 @@ namespace WebApplication1.Data
         public DbSet<Job> Jobs { get; set; }
         public DbSet<Proposal> Proposal { get; set; }
         public DbSet<SavedJob> SavedJob { get; set; }
-
-        /*        protected override void OnModelCreating(ModelBuilder modelBuilder)
-                {
-                    modelBuilder.Entity<StudentCourse>().HasKey(sc => new {sc.UserId, sc.CourseId});
-                    modelBuilder.Entity<StudentCourse>()
-                        .HasOne(sc => sc.User)
-                        .WithMany(s => s.StudentCourse)
-                        .HasForeignKey(sc => sc.UserId)
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    modelBuilder.Entity<StudentCourse>()
-                        .HasOne(sc => sc.Course)
-                        .WithMany(c => c.StudentCourse)
-                        .HasForeignKey(sc => sc.CourseId)
-                        .OnDelete(DeleteBehavior.Restrict);
-                }*/
   
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -39,6 +23,7 @@ namespace WebApplication1.Data
             modelBuilder.Entity<JobSeeker>().ToTable("JobSeekers");
             modelBuilder.Entity<Job>().ToTable("Jobs");
             modelBuilder.Entity<Proposal>().ToTable("Proposals");
+            modelBuilder.Entity<SavedJob>().ToTable("SavedJobs");
 
 
             modelBuilder.Entity<Employer>()
@@ -77,6 +62,18 @@ namespace WebApplication1.Data
                 .HasOne(p => p.JobSeeker)
                 .WithMany(js => js.Proposals)
                 .HasForeignKey(p => p.JobSeekerId)
+                .OnDelete(DeleteBehavior.Restrict);
+           
+            modelBuilder.Entity<SavedJob>()
+               .HasOne(sj => sj.JobSeeker)
+               .WithMany(js => js.SavedJobs)
+               .HasForeignKey(sj => sj.JobSeekerId)
+               .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<SavedJob>()
+                .HasOne(sj => sj.Job)
+                .WithMany(j => j.SavedJobs)
+                .HasForeignKey(sj => sj.JobId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }
