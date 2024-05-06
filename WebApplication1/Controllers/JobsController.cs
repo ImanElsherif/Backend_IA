@@ -1,5 +1,16 @@
-using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using WebApplication1.Data;
 using WebApplication1.Dtos;
 using WebApplication1.Models;
@@ -37,7 +48,7 @@ namespace WebApplication1.Controllers
             }
             return Ok(job);
         }
-
+        [Authorize(Roles = "employer")]
         [HttpPost]
         public async Task<IActionResult> CreateJob([FromBody] JobDto jobDto)
         {

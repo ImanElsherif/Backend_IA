@@ -42,6 +42,7 @@ namespace WebApplication1.Controllers
                  }
             return Ok(users);
         }
+
 [Authorize(Roles = "Admin")]
 [HttpGet("employers")]
 public async Task<IActionResult> GetEmployers()
@@ -150,6 +151,7 @@ public async Task<IActionResult> GetEmployers()
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("employer/{id}")]
         public async Task<IActionResult> DeleteEmployer(int id)
         {
@@ -172,7 +174,7 @@ public async Task<IActionResult> GetEmployers()
             }
         }
 
-
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] EmployerDto userDto)
         {
@@ -200,16 +202,6 @@ public async Task<IActionResult> GetEmployers()
                 existingUser.PasswordSalt = passwordSalt;
             }
 
-         /*   // Check if ProfilePic is not null, indicating a profile picture update
-            if (userDto.ProfilePic != null)
-            {
-                // Convert the uploaded file to a byte array and assign it to ProfilePic
-                using (var ms = new MemoryStream())
-                {
-                    await userDto.ProfilePic.CopyToAsync(ms);
-                    existingUser.ProfilePic = ms.ToArray();
-                }
-            }*/
 
             // Save the changes to the database
             try

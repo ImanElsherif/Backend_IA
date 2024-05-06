@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -84,6 +85,7 @@ namespace WebApplication1.Controllers
                         roles = userTypes
                     });
                 }*/
+       
         [HttpPost("register-admin")]
         public async Task<IActionResult> RegisterAdmin([FromForm] UserDto adminDto)
         {
@@ -119,7 +121,8 @@ namespace WebApplication1.Controllers
             return StatusCode(201);
         }
 
-        [HttpPost("register-employer")]
+[Authorize(Roles = "Admin")]
+[HttpPost("register-employer")]
 public async Task<IActionResult> Register([FromForm] EmployerDto employerDto)
 {
     // Normalize email input
