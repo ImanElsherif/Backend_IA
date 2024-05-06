@@ -31,6 +31,13 @@ builder.Services.AddScoped<IDataRepository<SavedJob>, DataRepository<SavedJob>>(
 builder.Services.AddScoped<IDataRepository<Employer>, DataRepository<Employer>>();
 builder.Services.AddScoped<IDataRepository<JobSeeker>, DataRepository<JobSeeker>>();
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("EmployerPolicy", policy => policy.RequireRole("Employer"));
+    options.AddPolicy("JobSeekerPolicy", policy => policy.RequireRole("JobSeeker"));
+    options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
+});
+
 builder.Services.AddControllersWithViews().AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles);
 builder.Services.AddAuthentication(opt =>
 {

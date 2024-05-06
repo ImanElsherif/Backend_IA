@@ -9,6 +9,7 @@ using WebApplication1.Models;
 
 namespace WebApplication1.Controllers
 {
+
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
@@ -41,8 +42,8 @@ namespace WebApplication1.Controllers
                  }
             return Ok(users);
         }
-
- [HttpGet("employers")]
+[Authorize(Roles = "Admin")]
+[HttpGet("employers")]
 public async Task<IActionResult> GetEmployers()
 {
     var employers = await _employerRepository.GetAllAsync();
@@ -75,6 +76,7 @@ public async Task<IActionResult> GetEmployers()
                     return Ok(userDto);
                 }*/
 
+        
         [HttpGet("employer/{id}")]
         public async Task<IActionResult> Getemployer(int id)
         {
