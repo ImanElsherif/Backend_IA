@@ -30,7 +30,7 @@ namespace WebApplication1.Controllers
             _proposalRepository = proposalRepository;
         }
 
-
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAllJobs()
         {
