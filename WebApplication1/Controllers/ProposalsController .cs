@@ -173,6 +173,13 @@ namespace WebApplication1.Controllers
             return Ok(proposals);
         }
 
+        [HttpGet("seeker/{jobSeekerId}")]
+        public async Task<IActionResult> GetAcceptedProposalsByJobSeekerId(int jobSeekerId)
+        {
+            var proposals = await _proposalRepository.GetAllAsync(p => p.JobSeekerId == jobSeekerId && p.Status == "Accepted");
+            return Ok(proposals);
+        }
+
         [HttpGet("job/{jobId}/user/{userId}")]
         public async Task<IActionResult> GetProposalStatusByJobAndUser(int jobId, int userId)
         {
