@@ -14,7 +14,9 @@ namespace WebApplication1.Data
         public DbSet<Job> Jobs { get; set; }
         public DbSet<Proposal> Proposal { get; set; }
         public DbSet<SavedJob> SavedJob { get; set; }
-  
+        public DbSet<Chat> Chat { get; set; }
+      
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

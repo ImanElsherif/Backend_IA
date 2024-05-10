@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "uPfITjv1xLbvgXgDYjwHPqFtLQRDNOd5a3Mergkop2XNKAf+e9jFuPSb/q5hZbN+r2o7dQU6pYOJyNIHINshJg==",
+  "dgSpecHash": "W5JtnMUSBq26ztgFBvW2fZfcAL4XaqCTb9KjyYLA6kmL1gGVPehkqoeNqogbkzpFey4IuzqZpT0Zz9fBnV19GA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\imane\\OneDrive\\Desktop\\WSB\\WebApplication1\\WebApplication1.csproj",
+  "projectFilePath": "C:\\Users\\imane\\OneDrive\\Desktop\\chatBE\\WebApplication1\\WebApplication1.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\imane\\.nuget\\packages\\automapper\\13.0.1\\automapper.13.0.1.nupkg.sha512",
     "C:\\Users\\imane\\.nuget\\packages\\azure.core\\1.35.0\\azure.core.1.35.0.nupkg.sha512",

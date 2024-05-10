@@ -224,6 +224,27 @@ public async Task<IActionResult> GetEmployers()
             }
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetUserById(int id)
+        {
+            var user = await _userRepository.GetByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound($"User with ID {id} not found.");
+            }
+
+            // Depending on your User model properties, construct a DTO or return the user entity directly
+            var userDto = new
+            {
+                // Populate the DTO with user properties
+                Id = user.Id,
+                Email = user.Email,
+                UserTypeId = user.UserTypeId,
+                // Add other properties as needed
+            };
+
+            return Ok(userDto);
+        }
 
 
     }

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\imane\\OneDrive\\Desktop\\WSB\\WebApplication1\\WebApplication1.csproj": {}
+    "C:\\Users\\imane\\OneDrive\\Desktop\\chatBE\\WebApplication1\\WebApplication1.csproj": {}
   },
   "projects": {
-    "C:\\Users\\imane\\OneDrive\\Desktop\\WSB\\WebApplication1\\WebApplication1.csproj": {
+    "C:\\Users\\imane\\OneDrive\\Desktop\\chatBE\\WebApplication1\\WebApplication1.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\imane\\OneDrive\\Desktop\\WSB\\WebApplication1\\WebApplication1.csproj",
+        "projectUniqueName": "C:\\Users\\imane\\OneDrive\\Desktop\\chatBE\\WebApplication1\\WebApplication1.csproj",
         "projectName": "WebApplication1",
-        "projectPath": "C:\\Users\\imane\\OneDrive\\Desktop\\WSB\\WebApplication1\\WebApplication1.csproj",
+        "projectPath": "C:\\Users\\imane\\OneDrive\\Desktop\\chatBE\\WebApplication1\\WebApplication1.csproj",
         "packagesPath": "C:\\Users\\imane\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\imane\\OneDrive\\Desktop\\WSB\\WebApplication1\\obj\\",
+        "outputPath": "C:\\Users\\imane\\OneDrive\\Desktop\\chatBE\\WebApplication1\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\imane\\AppData\\Roaming\\NuGet\\NuGet.Config",
