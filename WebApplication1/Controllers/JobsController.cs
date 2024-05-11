@@ -9,6 +9,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using WebApplication1.Data;
@@ -23,11 +24,13 @@ namespace WebApplication1.Controllers
     {
         private readonly IDataRepository<Job> _jobRepository;
         private readonly IDataRepository<Proposal> _proposalRepository;
+        private readonly IHubContext<HupConnection> _hubContext; // Updated variable name
 
-        public JobsController(IDataRepository<Job> jobRepository, IDataRepository<Proposal> proposalRepository)
+        public JobsController(IDataRepository<Job> jobRepository, IDataRepository<Proposal> proposalRepository, IHubContext<HupConnection> hubContext) // Updated constructor
         {
             _jobRepository = jobRepository;
             _proposalRepository = proposalRepository;
+            _hubContext = hubContext; // Updated assignment
         }
 
         [Authorize(Roles = "Admin,job seeker")]
@@ -48,6 +51,7 @@ namespace WebApplication1.Controllers
             }
             return Ok(job);
         }
+
         [Authorize(Roles = "employer")]
         [HttpPost]
         public async Task<IActionResult> CreateJob([FromBody] JobDto jobDto)
@@ -67,6 +71,10 @@ namespace WebApplication1.Controllers
 
             await _jobRepository.AddAsync(job);
             await _jobRepository.Save();
+
+            // Send SignalR event for new job added
+            await _hubContext.Clients.All.SendAsync("NewJobAdded", job.EmployerId);
+
             return CreatedAtAction(nameof(GetJobById), new { id = job.JobId }, job);
         }
 
@@ -85,16 +93,13 @@ namespace WebApplication1.Controllers
                 return BadRequest("The job is already in the specified status.");
             }
 
-            // Check if the job is in a state that can be transitioned to the given status
-
-
-            // Validate the input status
-
-
             job.Status = status;  // Update the status
 
-            _jobRepository.UpdateAsync(job);  // Assuming UpdateAsync handles the update operation
+            await _jobRepository.UpdateAsync(job);  // Assuming UpdateAsync handles the update operation
             await _jobRepository.Save();
+
+            // Send SignalR event for job status update
+            await _hubContext.Clients.All.SendAsync("JobStatusUpdated", job.JobId, status);
 
             return NoContent();  // HTTP 204 - No content to send in response, signifies successful update
         }
@@ -110,7 +115,7 @@ namespace WebApplication1.Controllers
 
             job.NumProposals++;  // Increment the number of proposals
 
-            _jobRepository.UpdateAsync(job);  // Save the updated job
+            await _jobRepository.UpdateAsync(job);  // Save the updated job
             await _jobRepository.Save();
 
             return NoContent();  // Return HTTP 204 No Content to indicate success without sending data back
@@ -151,10 +156,5 @@ namespace WebApplication1.Controllers
                 return StatusCode(500, $"An error occurred while fetching jobs with no accepted proposals: {ex.Message}");
             }
         }
-
-
-
-
-
     }
 }
